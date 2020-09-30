@@ -3,6 +3,7 @@
  */
 const InMemoryMetricRepository = require("../repositories/InMemoryMetricRepository");
 const {getTimePeriodInMillis} = require("../common/date-time-utils");
+const logger = require('../common/logger');
 
 module.exports = class MetricService
 {
@@ -24,6 +25,7 @@ module.exports = class MetricService
     if (!this.clearOldMetricQueued)
     {
       setTimeout(() => {
+        logger.info('clearing old metric data');
         this.metricRepository.clearOldMetrics(this.timePeriodToKeepRecordsOf);
         this.clearOldMetricQueued = false;
       }, 0);
@@ -38,6 +40,7 @@ module.exports = class MetricService
    */
   saveMetric(key, value)
   {
+    logger.info(`saving metric for ${key}`);
     this.metricRepository.addMetric(key, Math.round(parseFloat(value)), new Date().getTime());
     this.clearOldMetric();
   }
@@ -49,6 +52,7 @@ module.exports = class MetricService
    */
   getSum(key)
   {
+    logger.info(`fetching metric sum for ${key}`);
     const metrics = this.metricRepository.getMetrics(key, this.timePeriodToKeepRecordsOf);
     this.clearOldMetric();
 
